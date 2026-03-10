@@ -26,21 +26,10 @@ func main() {
 		logger: logger,
 	}
 
-	//initialize a new servemux
-	mux := http.NewServeMux()
-
-	fileServer := http.FileServer(http.Dir("./ui/static/"))
-	mux.Handle("GET /static/", http.StripPrefix("/static", fileServer))
-
-	mux.HandleFunc("GET /{$}", app.home)
-	mux.HandleFunc("GET /stash/view/{id}", app.stashView)
-	mux.HandleFunc("GET /stash/create", app.stashCreate)
-	mux.HandleFunc("POST /stash/create", app.stashCreatePost)
-
 	logger.Info("Starting server", slog.String("addr", ":8000"))
 
 	//Start web server
-	err := http.ListenAndServe(*addr, mux)
+	err := http.ListenAndServe(*addr, app.routes())
 
 	logger.Error(err.Error())
 	os.Exit(1)
