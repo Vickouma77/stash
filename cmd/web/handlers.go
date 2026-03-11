@@ -44,7 +44,16 @@ func (a *Application) stashCreate(w http.ResponseWriter, r *http.Request) {
 }
 
 func (a *Application) stashCreatePost(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(http.StatusCreated)
+	//Dummy data
+	title := "O snail"
+	content := "O snail\nClimb Mount Fuji,\nBut slowly, slowly!\n\n– Kobayashi Issa"
+	expires := 7
 
-	w.Write([]byte("Save a new stash..."))
+	id, err := a.snippets.Insert(title, content, expires)
+	if err != nil {
+		a.ServerError(w, r, err)
+		return
+	}
+
+	http.Redirect(w, r, fmt.Sprintf("/stash/view/%d", id), http.StatusSeeOther)
 }

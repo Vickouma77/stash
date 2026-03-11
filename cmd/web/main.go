@@ -13,7 +13,7 @@ import (
 )
 
 type Application struct {
-	logger *slog.Logger
+	logger   *slog.Logger
 	snippets *models.SnippetModel
 }
 
@@ -40,7 +40,7 @@ func main() {
 
 	//Initialize a new instance of Application struct
 	app := &Application{
-		logger: logger,
+		logger:   logger,
 		snippets: &models.SnippetModel{DB: db},
 	}
 
