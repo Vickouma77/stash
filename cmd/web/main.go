@@ -7,11 +7,14 @@ import (
 	"net/http"
 	"os"
 
+	"stash.io/internal/models"
+
 	_ "github.com/go-sql-driver/mysql"
 )
 
 type Application struct {
 	logger *slog.Logger
+	snippets *models.SnippetModel
 }
 
 func main() {
@@ -38,6 +41,7 @@ func main() {
 	//Initialize a new instance of Application struct
 	app := &Application{
 		logger: logger,
+		snippets: &models.SnippetModel{DB: db},
 	}
 
 	logger.Info("Starting server", slog.String("addr", ":8000"))
