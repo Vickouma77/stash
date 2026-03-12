@@ -47,7 +47,9 @@ func (a *Application) stashView(w http.ResponseWriter, r *http.Request) {
 }
 
 func (a *Application) stashCreate(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("Display Form for new stash..."))
+	data := a.newTemplateData(r)
+
+	a.render(w, r, http.StatusOK, "create.tmpl.html", data)
 }
 
 func (a *Application) stashCreatePost(w http.ResponseWriter, r *http.Request) {
