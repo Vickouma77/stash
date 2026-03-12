@@ -2,6 +2,8 @@ package main
 
 import (
 	"net/http"
+
+	"github.com/justinas/alice"
 )
 
 func (a *Application) routes() http.Handler {
@@ -15,5 +17,7 @@ func (a *Application) routes() http.Handler {
 	mux.HandleFunc("GET /stash/create", a.stashCreate)
 	mux.HandleFunc("POST /stash/create", a.stashCreatePost)
 
-	return a.logRequest(commonHandler(mux))
+	standard := alice.New(a.recoverPanic, a.logRequest, commonHandler)
+
+	return standard.Then(mux)
 }
