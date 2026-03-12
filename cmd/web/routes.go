@@ -15,5 +15,5 @@ func (a *Application) routes() http.Handler {
 	mux.HandleFunc("GET /stash/create", a.stashCreate)
 	mux.HandleFunc("POST /stash/create", a.stashCreatePost)
 
-	return commonHandler(mux)
+	return a.logRequest(commonHandler(mux))
 }
