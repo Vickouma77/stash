@@ -58,6 +58,10 @@ func (a *Application) stashView(w http.ResponseWriter, r *http.Request) {
 func (a *Application) stashCreate(w http.ResponseWriter, r *http.Request) {
 	data := a.newTemplateData(r)
 
+	data.Form = StashCreateForm{
+		Expires: 365,
+	}
+
 	a.render(w, r, http.StatusOK, "create.tmpl.html", data)
 }
 
@@ -81,24 +85,21 @@ func (a *Application) stashCreatePost(w http.ResponseWriter, r *http.Request) {
 		FieldErrors: map[string]string{},
 	}
 
-	// Map to hold validation errors
-	fieldErrors := make(map[string]string)
-
 	// Checking that the title value is not blank and is not more than 100 characters long.
 	if strings.TrimSpace(form.Title) == "" {
-		fieldErrors["title"] = "This field cannot be blank"
+		form.FieldErrors["title"] = "This field cannot be blank"
 	} else if utf8.RuneCountInString(form.Title) > 100 {
-		fieldErrors["title"] = "This field cannot be more than 100 characters long"
+		form.FieldErrors["title"] = "This field cannot be more than 100 characters long"
 	}
 
 	// Checking the content value is not blank
 	if strings.TrimSpace(form.Content) == "" {
-		fieldErrors["content"] = "This field cannot be blank"
+		form.FieldErrors["content"] = "This field cannot be blank"
 	}
 
 	// Check the expires value matches one of the permitted values (1, 7 or 365).
 	if form.Expires != 1 && form.Expires != 7 && form.Expires != 365 {
-		fieldErrors["expires"] = "This field must equal 1, 7, 365"
+		form.FieldErrors["expires"] = "This field must equal 1, 7, 365"
 	}
 
 	// If there are any errors, dump them in a plain text HTTP response and return from the handler.
