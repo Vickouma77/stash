@@ -11,8 +11,6 @@ import (
 
 // home handler function with byte slice string
 func (a *Application) home(w http.ResponseWriter, r *http.Request) {
-	w.Header().Add("Server", "Go")
-
 	snippets, err := a.snippets.Latest()
 	if err != nil {
 		a.ServerError(w, r, err)

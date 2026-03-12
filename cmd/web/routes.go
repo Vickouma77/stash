@@ -4,7 +4,7 @@ import (
 	"net/http"
 )
 
-func (a *Application) routes() *http.ServeMux {
+func (a *Application) routes() http.Handler {
 	mux := http.NewServeMux()
 
 	fileServer := http.FileServer(http.Dir("./ui/static/"))
@@ -15,5 +15,5 @@ func (a *Application) routes() *http.ServeMux {
 	mux.HandleFunc("GET /stash/create", a.stashCreate)
 	mux.HandleFunc("POST /stash/create", a.stashCreatePost)
 
-	return mux
+	return commonHandler(mux)
 }

@@ -11,8 +11,8 @@ import (
 // TemplateData holds dynamic data passed to HTML templates.
 type TemplateData struct {
 	CurrentYear int
-	Snippet  models.Snippet
-	Snippets []models.Snippet
+	Snippet     models.Snippet
+	Snippets    []models.Snippet
 }
 
 func humanDate(t time.Time) string {
