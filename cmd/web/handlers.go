@@ -53,10 +53,20 @@ func (a *Application) stashCreate(w http.ResponseWriter, r *http.Request) {
 }
 
 func (a *Application) stashCreatePost(w http.ResponseWriter, r *http.Request) {
-	//Dummy data
-	title := "O snail"
-	content := "O snail\nClimb Mount Fuji,\nBut slowly, slowly!\n\n– Kobayashi Issa"
-	expires := 7
+	err := r.ParseForm()
+	if err != nil {
+		a.ClientError(w, http.StatusBadRequest)
+		return
+	}
+
+	title := r.PostForm.Get("title")
+	content := r.PostForm.Get("content")
+	
+	expires, err := strconv.Atoi(r.PostForm.Get("expires"))
+	if err != nil {
+		a.ClientError(w, http.StatusBadRequest)
+		return
+	}
 
 	id, err := a.snippets.Insert(title, content, expires)
 	if err != nil {
