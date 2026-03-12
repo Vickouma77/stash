@@ -1,9 +1,11 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 	"net/http"
 	"runtime/debug"
+	"time"
 )
 
 // Server Error.Writing log entry at Error level,then sends generic 500 internal server error
@@ -32,10 +34,21 @@ func (a *Application) render(w http.ResponseWriter, r *http.Request, status int,
 		return
 	}
 
-	w.WriteHeader(status)
+	//Initialize new buffer
+	buf := new(bytes.Buffer)
 
-	err := ts.ExecuteTemplate(w, "base", data)
+	err := ts.ExecuteTemplate(buf, "base", data)
 	if err != nil {
 		a.ServerError(w, r, err)
+	}
+
+	w.WriteHeader(status)
+
+	buf.WriteTo(w)
+}
+
+func (a *Application) newTemplateData(r *http.Request) TemplateData {
+	return TemplateData{
+		CurrentYear: time.Now().Year(),
 	}
 }

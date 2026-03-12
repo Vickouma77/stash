@@ -19,9 +19,8 @@ func (a *Application) home(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	data := TemplateData{
-		Snippets: snippets,
-	}
+	data := a.newTemplateData(r)
+	data.Snippets = snippets
 
 	a.render(w, r, http.StatusOK, "home.tmpl.html", data)
 }
@@ -43,9 +42,8 @@ func (a *Application) stashView(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	data := TemplateData{
-		Snippet: snippet,
-	}
+	data := a.newTemplateData(r)
+	data.Snippet = snippet
 
 	a.render(w, r, http.StatusOK, "view.tmpl.html", data)
 }
