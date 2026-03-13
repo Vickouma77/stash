@@ -5,17 +5,16 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
-	"strings"
-	"unicode/utf8"
 
 	"stash.io/internal/models"
+	"stash.io/internal/validator"
 )
 
 type StashCreateForm struct {
-	Title       string
-	Content     string
-	Expires     int
-	FieldErrors map[string]string
+	Title   string
+	Content string
+	Expires int
+	validator.Validator
 }
 
 // home handler function with byte slice string
@@ -79,35 +78,21 @@ func (a *Application) stashCreatePost(w http.ResponseWriter, r *http.Request) {
 	}
 
 	form := StashCreateForm{
-		Title:       r.PostForm.Get("title"),
-		Content:     r.PostForm.Get("content"),
-		Expires:     expires,
-		FieldErrors: map[string]string{},
+		Title:   r.PostForm.Get("title"),
+		Content: r.PostForm.Get("content"),
+		Expires: expires,
 	}
 
-	// Checking that the title value is not blank and is not more than 100 characters long.
-	if strings.TrimSpace(form.Title) == "" {
-		form.FieldErrors["title"] = "This field cannot be blank"
-	} else if utf8.RuneCountInString(form.Title) > 100 {
-		form.FieldErrors["title"] = "This field cannot be more than 100 characters long"
-	}
+	form.CheckField(validator.NotBlank(form.Title), "title", "This field cannot be emoty")
+	form.CheckField(validator.MaxChars(form.Title, 100), "title", "This field cannot be more than 100 characters long")
+	form.CheckField(validator.NotBlank(form.Content), "content", "This field cannot be blank")
+	form.CheckField(validator.PermittedValue(form.Expires, 1, 7, 365), "expires", "This field must equal 1, 7, 365")
 
-	// Checking the content value is not blank
-	if strings.TrimSpace(form.Content) == "" {
-		form.FieldErrors["content"] = "This field cannot be blank"
-	}
-
-	// Check the expires value matches one of the permitted values (1, 7 or 365).
-	if form.Expires != 1 && form.Expires != 7 && form.Expires != 365 {
-		form.FieldErrors["expires"] = "This field must equal 1, 7, 365"
-	}
-
-	// If there are any errors, dump them in a plain text HTTP response and return from the handler.
-	if len(form.FieldErrors) > 0 {
+	if !form.Valid() {
 		data := a.newTemplateData(r)
 		data.Form = form
+
 		a.render(w, r, http.StatusUnprocessableEntity, "create.tmpl.html", data)
-		return
 	}
 
 	id, err := a.snippets.Insert(form.Title, form.Content, expires)
