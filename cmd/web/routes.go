@@ -12,10 +12,12 @@ func (a *Application) routes() http.Handler {
 	fileServer := http.FileServer(http.Dir("./ui/static/"))
 	mux.Handle("GET /static/", http.StripPrefix("/static", fileServer))
 
-	mux.HandleFunc("GET /{$}", a.home)
-	mux.HandleFunc("GET /stash/view/{id}", a.stashView)
-	mux.HandleFunc("GET /stash/create", a.stashCreate)
-	mux.HandleFunc("POST /stash/create", a.stashCreatePost)
+	dynamic := alice.New(a.sessionManager.LoadAndSave)
+
+	mux.Handle("GET /{$}", dynamic.ThenFunc(a.home))
+	mux.Handle("GET /stash/view/{id}", dynamic.ThenFunc(a.stashView))
+	mux.Handle("GET /stash/create", dynamic.ThenFunc(a.stashCreate))
+	mux.Handle("POST /stash/create", dynamic.ThenFunc(a.stashCreatePost))
 
 	standard := alice.New(a.recoverPanic, a.logRequest, commonHandler)
 
