@@ -83,6 +83,7 @@ func (a *Application) stashCreatePost(w http.ResponseWriter, r *http.Request) {
 		data.Form = form
 
 		a.render(w, r, http.StatusUnprocessableEntity, "create.tmpl.html", data)
+		return
 	}
 
 	id, err := a.snippets.Insert(form.Title, form.Content, form.Expires)
