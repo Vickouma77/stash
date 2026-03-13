@@ -92,5 +92,7 @@ func (a *Application) stashCreatePost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	a.sessionManager.Put(r.Context(), "flash", "snippet created successfully")
+
 	http.Redirect(w, r, fmt.Sprintf("/stash/view/%d", id), http.StatusSeeOther)
 }
