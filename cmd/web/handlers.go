@@ -11,10 +11,10 @@ import (
 )
 
 type StashCreateForm struct {
-	Title   string
-	Content string
-	Expires int
-	validator.Validator
+	Title               string `form:"title"`
+	Content             string `form:"content"`
+	Expires             int    `form:"expires"`
+	validator.Validator `form:"-"`
 }
 
 // home handler function with byte slice string
@@ -65,22 +65,12 @@ func (a *Application) stashCreate(w http.ResponseWriter, r *http.Request) {
 }
 
 func (a *Application) stashCreatePost(w http.ResponseWriter, r *http.Request) {
-	err := r.ParseForm()
+	var form StashCreateForm
+
+	err := a.decodePostForm(r, &form)
 	if err != nil {
 		a.ClientError(w, http.StatusBadRequest)
 		return
-	}
-
-	expires, err := strconv.Atoi(r.PostForm.Get("expires"))
-	if err != nil {
-		a.ClientError(w, http.StatusBadRequest)
-		return
-	}
-
-	form := StashCreateForm{
-		Title:   r.PostForm.Get("title"),
-		Content: r.PostForm.Get("content"),
-		Expires: expires,
 	}
 
 	form.CheckField(validator.NotBlank(form.Title), "title", "This field cannot be emoty")
@@ -95,7 +85,7 @@ func (a *Application) stashCreatePost(w http.ResponseWriter, r *http.Request) {
 		a.render(w, r, http.StatusUnprocessableEntity, "create.tmpl.html", data)
 	}
 
-	id, err := a.snippets.Insert(form.Title, form.Content, expires)
+	id, err := a.snippets.Insert(form.Title, form.Content, form.Expires)
 	if err != nil {
 		a.ServerError(w, r, err)
 		return
