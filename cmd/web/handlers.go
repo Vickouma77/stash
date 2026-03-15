@@ -24,6 +24,12 @@ type UserSignupForm struct {
 	validator.Validator `form:"-"`
 }
 
+type UserLoginForm struct {
+	Email               string `form:"email"`
+	Password            string `form:"password"`
+	validator.Validator `form:"-"`
+}
+
 // home handler function with byte slice string
 func (a *Application) home(w http.ResponseWriter, r *http.Request) {
 	snippets, err := a.snippets.Latest()
@@ -158,11 +164,58 @@ func (a *Application) userSignupPost(w http.ResponseWriter, r *http.Request) {
 }
 
 func (a *Application) userLogin(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(w, "Display a form for logging in a user...")
+	data := a.newTemplateData(r)
+	data.Form = UserLoginForm{}
+
+	a.render(w, r, http.StatusOK, "login.tmpl.html", data)
 }
 
 func (a *Application) userLoginPost(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(w, "Authenticate and login the user...")
+	var form UserLoginForm
+
+	err := a.decodePostForm(r, &form)
+	if err != nil {
+		a.ClientError(w, http.StatusBadRequest)
+		return
+	}
+	// Validation Checking
+	form.CheckField(validator.NotBlank(form.Email), "email", "This field cannot be empty")
+	form.CheckField(validator.Matches(form.Email, validator.EmailRX), "email", "This field must be a valid email address")
+	form.CheckField(validator.NotBlank(form.Password), "password", "This field cannot be blank")
+
+	if !form.Valid() {
+		data := a.newTemplateData(r)
+		data.Form = form
+
+		a.render(w, r, http.StatusUnprocessableEntity, "login.tmpl.html", data)
+		return
+	}
+
+	// Checking valid credentials
+	id, err := a.users.Authenticate(form.Email, form.Password)
+	if err != nil {
+		if errors.Is(err, models.ErrInvalidCredentials) {
+			form.AddNonFieldError("Email or password is incorect")
+
+			data := a.newTemplateData(r)
+			data.Form = form
+
+			a.render(w, r, http.StatusUnprocessableEntity, "login.tmpl.html", data)
+		} else {
+			a.ServerError(w, r, err)
+		}
+		return
+	}
+
+	err = a.sessionManager.RenewToken(r.Context())
+	if err != nil {
+		a.ServerError(w, r, err)
+		return
+	}
+
+	a.sessionManager.Put(r.Context(), "authenticatedUserID", id)
+
+	http.Redirect(w, r, "/stash/create", http.StatusSeeOther)
 }
 
 func (a *Application) userLogoutPost(w http.ResponseWriter, r *http.Request) {
