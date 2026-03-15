@@ -2,10 +2,13 @@
 package validator
 
 import (
+	"regexp"
 	"slices"
 	"strings"
 	"unicode/utf8"
 )
+
+var EmailRX = regexp.MustCompile("^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-])?)*$")
 
 // Validator holds a map of field-level validation error messages.
 // Each key is a form field name and each value is the associated error message.
@@ -50,4 +53,14 @@ func MaxChars(value string, n int) bool {
 // PermittedValue returns true if value is found among the provided permittedValues.
 func PermittedValue[T comparable](value T, permittedValues ...T) bool {
 	return slices.Contains(permittedValues, value)
+}
+
+// returns true if a value contains at least n characters.
+func MinChars(value string, n int) bool {
+	return utf8.RuneCountInString(value) >= n
+}
+
+// returns true if a value matches a provided compiled regular expression patter
+func Matches(value string, rx *regexp.Regexp) bool {
+	return rx.MatchString(value)
 }
