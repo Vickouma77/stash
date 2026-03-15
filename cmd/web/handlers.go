@@ -134,7 +134,27 @@ func (a *Application) userSignupPost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fmt.Fprintln(w, "Create a new user...")
+	// Try to create a new user record in the database. If the email already
+	// exists then add an error message to the form and re-display it.
+	err = a.users.Insert(form.Name, form.Email, form.Password)
+	if err != nil {
+		if errors.Is(err, models.ErrDuplicateEmail) {
+			form.AddFieldError("email", "email address is already in use")
+
+			data := a.newTemplateData(r)
+			data.Form = form
+
+			a.render(w, r, http.StatusUnprocessableEntity, "signup.tmpl.html", data)
+		} else {
+			a.ServerError(w, r, err)
+		}
+		return
+	}
+
+	// Otherwise add a confirmation flash message to the session confirming that their signup worked.
+	a.sessionManager.Put(r.Context(), "flash", "Your signup was successful, please login")
+
+	http.Redirect(w, r, "/user/login", http.StatusSeeOther)
 }
 
 func (a *Application) userLogin(w http.ResponseWriter, r *http.Request) {
