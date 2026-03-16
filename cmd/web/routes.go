@@ -13,7 +13,7 @@ func (a *Application) routes() http.Handler {
 	mux.Handle("GET /static/", http.StripPrefix("/static", fileServer))
 
 	// dynamic includes session management so handlers can read and write session data.
-	dynamic := alice.New(a.sessionManager.LoadAndSave)
+	dynamic := alice.New(a.sessionManager.LoadAndSave, noSurf)
 
 	mux.Handle("GET /{$}", dynamic.ThenFunc(a.home))
 	mux.Handle("GET /stash/view/{id}", dynamic.ThenFunc(a.stashView))

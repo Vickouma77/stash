@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/go-playground/form/v4"
+	"github.com/justinas/nosurf"
 )
 
 // Server Error.Writing log entry at Error level,then sends generic 500 internal server error
@@ -55,6 +56,7 @@ func (a *Application) newTemplateData(r *http.Request) TemplateData {
 		CurrentYear: time.Now().Year(),
 		Flash:       a.sessionManager.PopString(r.Context(), "flash"),
 		IsAuthenticated: a.isAuthenticated(r),
+		CSRFToken: nosurf.Token(r),
 	}
 }
 
