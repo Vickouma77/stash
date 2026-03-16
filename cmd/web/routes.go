@@ -3,14 +3,15 @@ package main
 import (
 	"net/http"
 
+	"stash.io/ui"
+
 	"github.com/justinas/alice"
 )
 
 func (a *Application) routes() http.Handler {
 	mux := http.NewServeMux()
 
-	fileServer := http.FileServer(http.Dir("./ui/static/"))
-	mux.Handle("GET /static/", http.StripPrefix("/static", fileServer))
+	mux.Handle("GET /static/", http.FileServerFS(ui.Files))
 
 	// dynamic includes session management so handlers can read and write session data.
 	dynamic := alice.New(a.sessionManager.LoadAndSave, noSurf, a.authenticate)
