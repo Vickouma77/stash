@@ -8,24 +8,24 @@ import (
 )
 
 func TestHumanDate(t *testing.T) {
-	tests := []struct{
+	tests := []struct {
 		name string
-		tm time.Time
+		tm   time.Time
 		want string
-	} {
+	}{
 		{
 			name: "UTC",
-			tm: time.Date(2026, 3, 16, 11, 15, 0, 0, time.UTC),
+			tm:   time.Date(2026, 3, 16, 11, 15, 0, 0, time.UTC),
 			want: "16 Mar 2026 at 11:15",
 		},
 		{
 			name: "Empty",
-			tm: time.Time{},
+			tm:   time.Time{},
 			want: "",
 		},
 		{
 			name: "CET",
-			tm: time.Date(2026, 3, 16, 11, 15, 0, 0, time.FixedZone("CET", 1*60*60)),
+			tm:   time.Date(2026, 3, 16, 11, 15, 0, 0, time.FixedZone("CET", 1*60*60)),
 			want: "16 Mar 2026 at 10:15",
 		},
 	}

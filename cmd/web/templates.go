@@ -12,13 +12,13 @@ import (
 
 // TemplateData holds dynamic data passed to HTML templates.
 type TemplateData struct {
-	CurrentYear int
-	Form        any
-	Snippet     models.Snippet
-	Snippets    []models.Snippet
-	Flash       string
+	CurrentYear     int
+	Form            any
+	Snippet         models.Snippet
+	Snippets        []models.Snippet
+	Flash           string
 	IsAuthenticated bool
-	CSRFToken string
+	CSRFToken       string
 }
 
 func humanDate(t time.Time) string {
@@ -48,7 +48,7 @@ func NewTemplateCache() (map[string]*template.Template, error) {
 	for _, page := range pages {
 		name := filepath.Base(page)
 
-		patterns := []string {
+		patterns := []string{
 			"html/base.tmpl.html",
 			"html/partials/*tmpl.html",
 			page,

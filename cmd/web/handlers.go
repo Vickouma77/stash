@@ -30,6 +30,11 @@ type UserLoginForm struct {
 	validator.Validator `form:"-"`
 }
 
+// ping handler function with byte slice string
+func ping(w http.ResponseWriter, r *http.Request) {
+	w.Write([]byte("OK"))
+}
+
 // home handler function with byte slice string
 func (a *Application) home(w http.ResponseWriter, r *http.Request) {
 	snippets, err := a.snippets.Latest()

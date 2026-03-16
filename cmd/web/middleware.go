@@ -28,7 +28,7 @@ func (a *Application) authenticate(next http.Handler) http.Handler {
 		id := a.sessionManager.GetInt(r.Context(), "authenticatedUserID")
 		if id == 0 {
 			next.ServeHTTP(w, r)
-			return 
+			return
 		}
 
 		exists, err := a.users.Exists(id)
@@ -79,7 +79,7 @@ func (a *Application) requireAuthentication(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if !a.isAuthenticated(r) {
 			http.Redirect(w, r, "/user/login", http.StatusSeeOther)
-			return 
+			return
 		}
 
 		// Otherwise set the "Cache-Control: no-store" header so that pages
@@ -95,8 +95,8 @@ func noSurf(next http.Handler) http.Handler {
 	csrfHandler := nosurf.New(next)
 	csrfHandler.SetBaseCookie(http.Cookie{
 		HttpOnly: true,
-		Path: "/",
-		Secure: true,
+		Path:     "/",
+		Secure:   true,
 	})
 	return csrfHandler
 }
