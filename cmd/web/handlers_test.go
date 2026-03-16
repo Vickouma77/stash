@@ -1,40 +1,20 @@
 package main
 
 import (
-	"bytes"
-	"io"
 	"net/http"
-	"net/http/httptest"
 	"testing"
 
 	"stash.io/internal/assert"
 )
 
 func TestPing(t *testing.T) {
-	// Initialize a new httptest.ResponseRecorder
-	rr := httptest.NewRecorder()
+	app := newTestApplication(t)
 
-	// New dummy http.Request
-	r, err := http.NewRequest(http.MethodGet, "/", nil)
-	if err != nil {
-		t.Fatal(err)
-	}
+	ts := newTestServer(t, app.routes())
+	defer ts.Close()
 
-	// httptest.ResponseRecorder and http.Request.
-	ping(rr, r)
+	code, _, body := ts.get(t, "/ping")
 
-	// Getting http.Response from ping()
-	rs := rr.Result()
-
-	assert.Equal(t, rs.StatusCode, http.StatusOK)
-
-	// Checking response body if it equals "OK"
-	defer rs.Body.Close()
-	body, err := io.ReadAll(rs.Body)
-	if err != nil {
-		t.Fatal(err)
-	}
-	body = bytes.TrimSpace(body)
-
-	assert.Equal(t, string(body), "OK")
+	assert.Equal(t, code, http.StatusOK)
+	assert.Equal(t, body, "OK")
 }

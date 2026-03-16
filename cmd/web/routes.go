@@ -13,6 +13,8 @@ func (a *Application) routes() http.Handler {
 
 	mux.Handle("GET /static/", http.FileServerFS(ui.Files))
 
+	mux.HandleFunc("GET /ping", ping)
+
 	// dynamic includes session management so handlers can read and write session data.
 	dynamic := alice.New(a.sessionManager.LoadAndSave, noSurf, a.authenticate)
 
