@@ -10,26 +10,26 @@ func TestUserModelExists(t *testing.T) {
 	if testing.Short() {
 		t.Skip("model: skipping integration test")
 	}
-	
+
 	tests := []struct {
-		name string
+		name   string
 		userID int
-		want bool
+		want   bool
 	}{
 		{
-			name: "Valid is",
+			name:   "Valid is",
 			userID: 1,
-			want: true,
+			want:   true,
 		},
 		{
-			name: "Zero id",
+			name:   "Zero id",
 			userID: 0,
-			want: false,
+			want:   false,
 		},
 		{
-			name: "Non-existen id",
+			name:   "Non-existen id",
 			userID: 2,
-			want: false,
+			want:   false,
 		},
 	}
 

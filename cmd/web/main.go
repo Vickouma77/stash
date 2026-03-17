@@ -19,6 +19,7 @@ import (
 )
 
 type Application struct {
+	debug          bool
 	logger         *slog.Logger
 	snippets       models.SnippetModelInterface
 	users          models.UserModelInterface
@@ -31,7 +32,9 @@ func main() {
 	//Command-line flag 'addr', a default value of :8000
 	addr := flag.String("addr", ":8000", "HTTP network address")
 	//Command-line flag 'dsn', MYSQL data source name
-	dsn := flag.String("mysql", "root:rootpassword@/stash?parseTime=true", "MYSQL data source name")
+	dsn := flag.String("dsn", "root:rootpassword@/stash?parseTime=true", "MYSQL data source name")
+	// Command-line flag 'debug'
+	debug := flag.Bool("debug", false, "Enable debug mode")
 	flag.Parse()
 
 	//initialize a new structured logger
@@ -67,6 +70,7 @@ func main() {
 
 	//Initialize a new instance of Application struct
 	app := &Application{
+		debug:          *debug,
 		logger:         logger,
 		snippets:       &models.SnippetModel{DB: db},
 		users:          &models.UserModel{DB: db},
