@@ -35,6 +35,12 @@ func ping(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("OK"))
 }
 
+func (a *Application) about(w http.ResponseWriter, r *http.Request) {
+	data := a.newTemplateData(r)
+
+	a.render(w, r, http.StatusOK, "about.tmpl.html", data)
+}
+
 // home handler function with byte slice string
 func (a *Application) home(w http.ResponseWriter, r *http.Request) {
 	snippets, err := a.snippets.Latest()
