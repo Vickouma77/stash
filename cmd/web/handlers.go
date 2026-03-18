@@ -226,6 +226,12 @@ func (a *Application) userLoginPost(w http.ResponseWriter, r *http.Request) {
 
 	a.sessionManager.Put(r.Context(), "authenticatedUserID", id)
 
+	path := a.sessionManager.PopString(r.Context(), "redirectPathAfterLogin")
+	if path != "" {
+		http.Redirect(w, r, path, http.StatusSeeOther)
+		return
+	}
+
 	http.Redirect(w, r, "/stash/create", http.StatusSeeOther)
 }
 
