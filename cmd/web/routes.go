@@ -32,6 +32,8 @@ func (a *Application) routes() http.Handler {
 	mux.Handle("GET /stash/create", protected.ThenFunc(a.stashCreate))
 	mux.Handle("POST /stash/create", protected.ThenFunc(a.stashCreatePost))
 	mux.Handle("GET /account/view", protected.ThenFunc(a.accountView))
+	mux.Handle("GET /account/password/update", protected.ThenFunc(a.accountPasswordUpdate))
+	mux.Handle("POST /account/password/update", protected.ThenFunc(a.accountPasswordUPdatePost))
 	mux.Handle("POST /user/logout", protected.ThenFunc(a.userLogoutPost))
 
 	standard := alice.New(a.recoverPanic, a.logRequest, commonHandler)
